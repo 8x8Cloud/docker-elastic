@@ -47,8 +47,8 @@ Note that the ElasticSearch image must be run first as Kibana uses a link. When 
 #### Clustered
 To run ElasticSearch in a clustered environment, you should use the Docker Compose file in the root of this git repository. Out of the box it will build you a three node cluster:
 
- * elasticsearch-master
- * elasticsearch-slave
+ * elasticsearch-master (*node.master=true*, *node.data=false*)
+ * elasticsearch-slave (*node.master=false, node.data=true*)
  * kibana
 
 Note that again we're using links. `Kibana` and `elasticsearch-slave` will both link back to the `elasticsearch-master` node, which in turn is also the only node that will map ports `9200` and `9300` externally. Likewise, the Kibana host will also map `5601` externally. You'll also notice that the `elasticsearch-slave` node will use ZenDisco unicast, specifying the `elasticsearch-master` node as the master.
@@ -74,6 +74,12 @@ docker-compose scale $NODE_TYPE=$NODE_COUNT
 ```
 
 When you scale in new nodes you'll see them spin up and connect to the cluster successfully. If you attach to a given Docker image you'll see in netstat that all the nodes are properly talking to each other. It's worth noting that this is *not* a production grade deployment, so if you lose your master, you're toast.
+
+#### Node disposition in a cluster
+
+The default `docker-compose.yml` builds a cluster where only `elasticsearch-master` is eligible for master election, and the `elasticsearch.yml` for all nodes has `discovery.zen.minimum_master_nodes=1`. This is because you are incredibly unlikely to have a network partition when running in containers on your local machine. Only the `elasticsearch-slave` nodes are configured to be data nodes, and there are no query-only nodes.
+
+If you want to try more exotic topologies/routing strategies go ahead and modify the `command` block for the node classes in `docker-compose.yml`, or or even create a new class of node such as `elasticsearch-query` with `node.master=false` and `node.data=false`. Just make sure you you have enough RAM to run all your nodes.
 
 ## Why
 

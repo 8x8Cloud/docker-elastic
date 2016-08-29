@@ -1,13 +1,14 @@
 elasticsearch-master:
   image: 8x8cloud/elasticsearch
-  ports: 
+  command: elasticsearch --node.data=false --node.master=true
+  ports:
     - "9200:9200"
     - "9300:9300"
   container_name: elasticsearch-master
 
 elasticsearch-slave:
   image: 8x8cloud/elasticsearch
-  command: elasticsearch --discovery.zen.ping.unicast.hosts=elasticsearch-master
+  command: elasticsearch --discovery.zen.ping.unicast.hosts=elasticsearch-master --node.master=false --node.data=true
   links:
     - elasticsearch-master
 
