@@ -25,7 +25,7 @@ If there is sufficient interest, we may release an image without Marvel baked in
 
 ## Clustering
 
-Networking in Docker can be a tad bit tricky. This image exposes ports 9200 and 9300, but when running in a cluster only one container can expose 9200 (the REST/JSON API) to the world, and thus render HQ. We're currently using what is apparently a "legacy" system via [links](https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/#/connect-with-the-linking-system).
+Networking in Docker can be a tad bit tricky. This image exposes ports 9200 and 9300, but when running in a cluster only one container can expose 9200 (the REST/JSON API) to the world, and thus render HQ.
 
 There are two configurations that can be used:
 
@@ -43,6 +43,7 @@ docker run --link elasticsearch -p 5601:5601 -d 8x8cloud/kibana
 
 Note that the ElasticSearch image must be run first as Kibana uses a link. When done, you can get to HQ via `localhost:9200/_plugin/hq`, and Mavel via `http://localhost:5601/app/marvel`.
 
+*Note: links are used for simplicity. You can also run this using a Docker network.*
 
 #### Clustered
 To run ElasticSearch in a clustered environment, you should use the Docker Compose file in the root of this git repository. Out of the box it will build you a three node cluster:
@@ -51,9 +52,9 @@ To run ElasticSearch in a clustered environment, you should use the Docker Compo
  * elasticsearch-slave (*node.master=false, node.data=true*)
  * kibana
 
-Note that again we're using links. `Kibana` and `elasticsearch-slave` will both link back to the `elasticsearch-master` node, which in turn is also the only node that will map ports `9200` and `9300` externally. Likewise, the Kibana host will also map `5601` externally. You'll also notice that the `elasticsearch-slave` node will use ZenDisco unicast, specifying the `elasticsearch-master` node as the master.
+Note that both `kibana` and `elasticsearch-slave` expect to connect to a node called `elasticsearch-master`, which will be the sole container mapping 9200 externally. Likewise, the Kibana host will also map `5601` externally. You'll also notice that the `elasticsearch-slave` node will use ZenDisco unicast, specifying the `elasticsearch-master` node as the master.
 
-The networking is a little funky because the default ElasticSearch mechanism is to plop yourself in the middle of something like an AWS AutoScaling Group, or in an environment where you can use multicast to discover nodes. In this case we're running multiple nodes on the same host, and obviously not all of them can bind the default ports of `9200` and `9300`. There are probably different ways of doing it, but preliminary googling suggested links were the way to do this. More to come...
+The networking is a little funky because the default ElasticSearch mechanism is to plop yourself in the middle of something like an AWS AutoScaling Group, or in an environment where you can use multicast to discover nodes. In this case we're running multiple nodes on the same host, and obviously not all of them can bind the default ports of `9200` and `9300`.
 
 When you want to scale new nodes, make sure to scale `elasticsearch-slave`. Here's a handy shell script:
 

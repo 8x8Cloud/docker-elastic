@@ -8,7 +8,7 @@ There are currently three pieces here:
  * A Kibana image (kibana/Dockerfile)
  * A Docker compose file for an ElasticSearch cluster with a Kibana visualization node (docker-compose.yml)
 
-The ElasticSearch image will work either stand-alone as a single node, or in a clustered formation using the Docker compose file. The Kibana image depends entirely on the ElasticSearch image, and uses a link to communicate.
+The ElasticSearch image will work either stand-alone as a single node, or in a clustered formation using the Docker compose file. The Docker compose file is version 2.0, and requires Docker 1.10.0 or greater.
 
 Each sub-directory has a more detailed readme, explaining what the image does.
 
@@ -45,9 +45,11 @@ docker run -d --name elasticsearch -p 9200:9200 8x8cloud/elasticsearch
 docker run --link elasticsearch -p 5601:5601 -d 8x8cloud/kibana
 ```
 
-## Using without Docker Compose and a different link name:
+*Note: links are used here for simplicity. You can also use a Docker network if you'd like.*
 
-Both the clustered, and non-clustered, deployments rely on Docker links to talk between servers. The clustered version expects to link to an image named `elasticsearch-master`, and the single-node version looks for `elasticsearch` by default. You can optionally change your image/link name like so:
+## Using without Docker Compose and a different ElasticSearch image name:
+
+The compose-based clustering contains an ElasticSearch master server named `elasticsearch-master`, which all slave nodes, and Kibana, will talk to. In a single-node mode, the Kibana server will default to looking at `elasticsearch`. If you'd like to name your ElasticSearch server something else, you can do so like this:
 
 ```bash
 # Alias our ES node to "beautiful_snowflake"
@@ -57,6 +59,8 @@ docker run -d --name beautiful_snowflake -p 9200:9200 8x8cloud/elasticsearch
 # environment variable to point to that instead of 'elasticsearch'.
 docker run -e "ELASTICSEARCH_HOST=http://beautiful_snowflake:9200" --link beautiful_snowflake -p 5601:5601 -d 8x8cloud/kibana
 ```
+
+*Note: links are used here for simplicity. You can also use a Docker network if you'd like, but you will still need to pass `ELASTICSEARCH_HOST`.*
 
 ## A note on disk usage
 
@@ -70,4 +74,4 @@ If you are absolutely sure that you don't need any of your volumes, you can alwa
 
 These images were designed for exploration, and are not configured for a production or other publicly available service. The purpose of these images is instead to explore ElasticSearch in an easy to access, safe environment (IE: not your production servers). They are also quite handy if you want to do ad-hoc parsing of, say, request logs.
 
-Please note that the standard disclaimers apply. There is no warranty, implied or otherwise, and there is no support offered. Do not run these in sensitive or public-facing environments. 
+Please note that the standard disclaimers apply. There is no warranty, implied or otherwise, and there is no support offered. Do not run these in sensitive or public-facing environments.

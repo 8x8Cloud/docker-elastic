@@ -40,6 +40,7 @@ Or you can point it at a single container, aliased to "elasticsearch" (see the E
 docker run --link elasticsearch -p 5601:5601 -d 8x8cloud/kibana
 ```
 
+*Note: links are used here for simplicity. You can also use a Docker network.*
 
 ## Why
 
