@@ -2,7 +2,7 @@
 FROM frolvlad/alpine-oraclejdk8:slim
 MAINTAINER Greg Feigenson <greg.feigenson@8x8.com>
 
-ENV ES_VERSION=2.3.4 ES_HOME=/usr/share/elasticsearch
+ENV ES_VERSION=2.4.0 ES_HOME=/usr/share/elasticsearch
 ENV PATH=${PATH}:${ES_HOME}/bin
 
 RUN apk update && apk upgrade && apk add --no-cache ca-certificates curl bash su-exec && \

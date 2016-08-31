@@ -1,11 +1,11 @@
 FROM alpine:3.4
 MAINTAINER Greg Feigenson <greg.feigenson@8x8.com>
 
-ENV KIBANA_VERSION=4.5.4 KIBANA_HOME=/usr/share/kibana PATH=${PATH}:${KIBANA_HOME}/bin
+ENV KIBANA_VERSION=4.6.0 KIBANA_HOME=/usr/share/kibana PATH=${PATH}:${KIBANA_HOME}/bin
 
 RUN apk update && apk upgrade && apk add --no-cache curl nodejs bash && \
-    curl -Ls https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VERSION-linux-x64.tar.gz | tar -xz -C /usr/share && \
-    ln -s /usr/share/kibana-$KIBANA_VERSION-linux-x64 $KIBANA_HOME && \
+    curl -Ls https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VERSION-linux-x86_64.tar.gz | tar -xz -C /usr/share && \
+    ln -s /usr/share/kibana-$KIBANA_VERSION-linux-x86_64 $KIBANA_HOME && \
 
     # We can't use the standard NPM/Node distributed with Kibana because we're not using glibc.
     # So let's grab one out of APK and symlink the distro. This is actually smaller than
